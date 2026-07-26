@@ -1,0 +1,9 @@
+version: "3.9"
+
+services:
+  app:
+    image: dataforge:latest
+    ports:
+      - "3000:3000"
+    environment:
+      APP_ENV: development
