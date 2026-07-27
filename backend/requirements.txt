@@ -1,1 +1,15 @@
-# Add backend dependencies here.
+fastapi
+uvicorn
+sqlalchemy
+psycopg[binary]
+authlib
+python-jose
+passlib[bcrypt]
+python-dotenv
+pydantic
+alembic
+pytest
+pytest-asyncio
+loguru
+python-multipart
+cors
