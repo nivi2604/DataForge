@@ -106,6 +106,306 @@ Errors should be returned in a consistent format with a clear message, error cod
 - Audit Logging: Security-relevant API activity should be recorded for review.
 - Rate Limiting: Requests should be controlled to reduce abuse and protect service integrity.
 
+## API Endpoints
+
+### Authentication
+
+#### POST /auth/register
+- Purpose: Register a new user account.
+- Authentication Required: No
+- Request: Registration details such as name, email, and password.
+- Response: Created account details and confirmation message.
+
+#### POST /auth/login
+- Purpose: Authenticate a user and issue an access token.
+- Authentication Required: No
+- Request: Email and password.
+- Response: Authentication result, access token, and refresh token information.
+
+#### POST /auth/logout
+- Purpose: End the current authenticated session.
+- Authentication Required: Yes
+- Request: Session or token context.
+- Response: Confirmation that the session ended successfully.
+
+#### POST /auth/refresh
+- Purpose: Refresh an access token using a valid refresh token.
+- Authentication Required: No
+- Request: Refresh token.
+- Response: New access token details.
+
+#### GET /auth/me
+- Purpose: Retrieve the current authenticated user profile.
+- Authentication Required: Yes
+- Request: Authenticated session context.
+- Response: Current user profile and account information.
+
+### Users
+
+#### GET /users
+- Purpose: Retrieve a list of users within the authorized context.
+- Authentication Required: Yes
+- Request: Optional filters and pagination parameters.
+- Response: Collection of user records with pagination metadata.
+
+#### GET /users/{id}
+- Purpose: Retrieve a specific user by identifier.
+- Authentication Required: Yes
+- Request: User identifier in the path.
+- Response: User details for the specified record.
+
+#### PUT /users/{id}
+- Purpose: Update a user profile or account settings.
+- Authentication Required: Yes
+- Request: Updated user information.
+- Response: Updated user record.
+
+#### DELETE /users/{id}
+- Purpose: Remove or deactivate a user account.
+- Authentication Required: Yes
+- Request: User identifier in the path.
+- Response: Confirmation of account removal or deactivation.
+
+### Organizations
+
+#### GET /organizations
+- Purpose: Retrieve organizations available to the current user.
+- Authentication Required: Yes
+- Request: Optional filters and pagination parameters.
+- Response: Collection of organization records.
+
+#### POST /organizations
+- Purpose: Create a new organization.
+- Authentication Required: Yes
+- Request: Organization name, description, and ownership details.
+- Response: Newly created organization record.
+
+#### GET /organizations/{id}
+- Purpose: Retrieve a specific organization.
+- Authentication Required: Yes
+- Request: Organization identifier in the path.
+- Response: Organization details.
+
+#### PUT /organizations/{id}
+- Purpose: Update an existing organization.
+- Authentication Required: Yes
+- Request: Updated organization information.
+- Response: Updated organization record.
+
+#### DELETE /organizations/{id}
+- Purpose: Delete or deactivate an organization.
+- Authentication Required: Yes
+- Request: Organization identifier in the path.
+- Response: Confirmation of organization removal or deactivation.
+
+### Workspaces
+
+#### GET /workspaces
+- Purpose: Retrieve workspaces available to the current user.
+- Authentication Required: Yes
+- Request: Optional filters and pagination parameters.
+- Response: Collection of workspace records.
+
+#### POST /workspaces
+- Purpose: Create a new workspace.
+- Authentication Required: Yes
+- Request: Workspace name, description, and organization context.
+- Response: Newly created workspace record.
+
+#### GET /workspaces/{id}
+- Purpose: Retrieve a specific workspace.
+- Authentication Required: Yes
+- Request: Workspace identifier in the path.
+- Response: Workspace details.
+
+#### PUT /workspaces/{id}
+- Purpose: Update an existing workspace.
+- Authentication Required: Yes
+- Request: Updated workspace information.
+- Response: Updated workspace record.
+
+#### DELETE /workspaces/{id}
+- Purpose: Delete a workspace.
+- Authentication Required: Yes
+- Request: Workspace identifier in the path.
+- Response: Confirmation of workspace deletion.
+
+### Projects
+
+#### GET /projects
+- Purpose: Retrieve projects available to the current user.
+- Authentication Required: Yes
+- Request: Optional filters and pagination parameters.
+- Response: Collection of project records.
+
+#### POST /projects
+- Purpose: Create a new project.
+- Authentication Required: Yes
+- Request: Project name, description, and workspace context.
+- Response: Newly created project record.
+
+#### GET /projects/{id}
+- Purpose: Retrieve a specific project.
+- Authentication Required: Yes
+- Request: Project identifier in the path.
+- Response: Project details.
+
+#### PUT /projects/{id}
+- Purpose: Update an existing project.
+- Authentication Required: Yes
+- Request: Updated project information.
+- Response: Updated project record.
+
+#### DELETE /projects/{id}
+- Purpose: Delete a project.
+- Authentication Required: Yes
+- Request: Project identifier in the path.
+- Response: Confirmation of project deletion.
+
+### Data Sources
+
+#### GET /data-sources
+- Purpose: Retrieve data sources available to the current project or user.
+- Authentication Required: Yes
+- Request: Optional filters and pagination parameters.
+- Response: Collection of data source records.
+
+#### POST /data-sources
+- Purpose: Create a new data source definition.
+- Authentication Required: Yes
+- Request: Data source name, type, and connection details.
+- Response: Newly created data source record.
+
+#### GET /data-sources/{id}
+- Purpose: Retrieve a specific data source.
+- Authentication Required: Yes
+- Request: Data source identifier in the path.
+- Response: Data source details.
+
+#### PUT /data-sources/{id}
+- Purpose: Update an existing data source.
+- Authentication Required: Yes
+- Request: Updated connection or metadata details.
+- Response: Updated data source record.
+
+#### DELETE /data-sources/{id}
+- Purpose: Delete a data source.
+- Authentication Required: Yes
+- Request: Data source identifier in the path.
+- Response: Confirmation of data source deletion.
+
+#### POST /data-sources/{id}/test-connection
+- Purpose: Validate the connectivity of a configured data source.
+- Authentication Required: Yes
+- Request: Data source identifier in the path.
+- Response: Connection test result and status.
+
+### Pipelines
+
+#### GET /pipelines
+- Purpose: Retrieve pipelines available to the current project or user.
+- Authentication Required: Yes
+- Request: Optional filters and pagination parameters.
+- Response: Collection of pipeline records.
+
+#### POST /pipelines
+- Purpose: Create a new pipeline definition.
+- Authentication Required: Yes
+- Request: Pipeline name, description, and initial configuration.
+- Response: Newly created pipeline record.
+
+#### GET /pipelines/{id}
+- Purpose: Retrieve a specific pipeline.
+- Authentication Required: Yes
+- Request: Pipeline identifier in the path.
+- Response: Pipeline details.
+
+#### PUT /pipelines/{id}
+- Purpose: Update an existing pipeline.
+- Authentication Required: Yes
+- Request: Updated pipeline definition.
+- Response: Updated pipeline record.
+
+#### DELETE /pipelines/{id}
+- Purpose: Delete a pipeline.
+- Authentication Required: Yes
+- Request: Pipeline identifier in the path.
+- Response: Confirmation of pipeline deletion.
+
+### Pipeline Executions
+
+#### POST /pipelines/{id}/execute
+- Purpose: Trigger execution of a pipeline.
+- Authentication Required: Yes
+- Request: Pipeline identifier in the path and optional execution parameters.
+- Response: Execution initiation details and status.
+
+#### GET /executions
+- Purpose: Retrieve execution history for the authorized context.
+- Authentication Required: Yes
+- Request: Optional filters and pagination parameters.
+- Response: Collection of execution records.
+
+#### GET /executions/{id}
+- Purpose: Retrieve a specific pipeline execution.
+- Authentication Required: Yes
+- Request: Execution identifier in the path.
+- Response: Execution details and related status information.
+
+#### POST /executions/{id}/cancel
+- Purpose: Request cancellation of an active execution.
+- Authentication Required: Yes
+- Request: Execution identifier in the path.
+- Response: Cancellation request result.
+
+### Schedules
+
+#### GET /schedules
+- Purpose: Retrieve schedules for accessible pipelines.
+- Authentication Required: Yes
+- Request: Optional filters and pagination parameters.
+- Response: Collection of schedule records.
+
+#### POST /schedules
+- Purpose: Create a new schedule.
+- Authentication Required: Yes
+- Request: Pipeline association and schedule definition.
+- Response: Newly created schedule record.
+
+#### PUT /schedules/{id}
+- Purpose: Update an existing schedule.
+- Authentication Required: Yes
+- Request: Updated schedule details.
+- Response: Updated schedule record.
+
+#### DELETE /schedules/{id}
+- Purpose: Remove a schedule.
+- Authentication Required: Yes
+- Request: Schedule identifier in the path.
+- Response: Confirmation of schedule deletion.
+
+### Notifications
+
+#### GET /notifications
+- Purpose: Retrieve notifications for the current user.
+- Authentication Required: Yes
+- Request: Optional filters and pagination parameters.
+- Response: Collection of notification records.
+
+#### PUT /notifications/{id}/read
+- Purpose: Mark a notification as read.
+- Authentication Required: Yes
+- Request: Notification identifier in the path.
+- Response: Updated notification status.
+
+### Health
+
+#### GET /health
+- Purpose: Check the availability of the platform API.
+- Authentication Required: No
+- Request: No request body.
+- Response: Service health status.
+
 ## Future Improvements
 - GraphQL
 - WebSockets
