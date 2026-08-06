@@ -1,15 +1,16 @@
 fastapi
 uvicorn
 sqlalchemy
-psycopg[binary]
-authlib
-python-jose
-passlib[bcrypt]
-python-dotenv
-pydantic
 alembic
-pytest
-pytest-asyncio
-loguru
+psycopg2-binary
+pydantic
+python-dotenv
+python-jose
+passlib
+# bcrypt 4.0.1 is pinned for compatibility with passlib's bcrypt backend
+bcrypt==4.0.1
 python-multipart
-cors
+redis
+celery
+minio
+pytest
