@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Header, Response, status
+from fastapi import APIRouter, Header, Response, status, UploadFile, File
 
 from app.api.routes.auth import auth_service
 from app.core.security import get_current_user
 from app.models.data_source import DataSource
+from app.models.user import User
 from app.schemas.data_source import (
     DataSourceCreate,
     DataSourceResponse,
@@ -11,21 +12,26 @@ from app.schemas.data_source import (
     TestConnectionResponse,
 )
 from app.services.data_source_service import DataSourceService
+from app.services.authorization_service import AuthorizationService
 
 router = APIRouter(prefix="/data-sources", tags=["data-sources"])
 data_source_service = DataSourceService()
 
 
-def _require_authentication(authorization: str | None) -> None:
-    get_current_user(authorization, auth_service.user_repository)
+def _require_authentication(authorization: str | None) -> User:
+    return get_current_user(authorization, auth_service.user_repository)
 
 
 @router.get("", response_model=list[DataSourceResponse])
 def list_data_sources(
+    project_id: str | None = None,
     authorization: str | None = Header(default=None, alias="Authorization"),
 ) -> list[DataSourceResponse]:
-    _require_authentication(authorization)
-    data_sources = data_source_service.list_data_sources()
+    user = _require_authentication(authorization)
+    if project_id:
+        AuthorizationService.verify_project_access(project_id, user.id)
+    data_sources = data_source_service.list_data_sources(project_id=project_id)
+    data_sources = AuthorizationService.filter_data_sources(data_sources, user.id)
     return [
         DataSourceResponse(
             id=data_source.id or "",
@@ -46,7 +52,8 @@ def get_data_source(
     data_source_id: str,
     authorization: str | None = Header(default=None, alias="Authorization"),
 ) -> DataSourceResponse:
-    _require_authentication(authorization)
+    user = _require_authentication(authorization)
+    AuthorizationService.verify_data_source_access(data_source_id, user.id)
     data_source = data_source_service.get_data_source(data_source_id)
     return DataSourceResponse(
         id=data_source.id or "",
@@ -65,7 +72,9 @@ def create_data_source(
     payload: DataSourceCreate,
     authorization: str | None = Header(default=None, alias="Authorization"),
 ) -> DataSourceResponse:
-    _require_authentication(authorization)
+    user = _require_authentication(authorization)
+    if payload.project_id:
+        AuthorizationService.verify_project_access(payload.project_id, user.id)
     data_source = data_source_service.create_data_source(payload)
     return DataSourceResponse(
         id=data_source.id or "",
@@ -85,7 +94,10 @@ def update_data_source(
     payload: DataSourceUpdate,
     authorization: str | None = Header(default=None, alias="Authorization"),
 ) -> DataSourceResponse:
-    _require_authentication(authorization)
+    user = _require_authentication(authorization)
+    AuthorizationService.verify_data_source_access(data_source_id, user.id)
+    if payload.project_id:
+        AuthorizationService.verify_project_access(payload.project_id, user.id)
     data_source = data_source_service.update_data_source(data_source_id, payload)
     return DataSourceResponse(
         id=data_source.id or "",
@@ -104,7 +116,8 @@ def delete_data_source(
     data_source_id: str,
     authorization: str | None = Header(default=None, alias="Authorization"),
 ) -> Response:
-    _require_authentication(authorization)
+    user = _require_authentication(authorization)
+    AuthorizationService.verify_data_source_access(data_source_id, user.id)
     data_source_service.delete_data_source(data_source_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -115,6 +128,27 @@ def test_connection(
     payload: TestConnectionRequest,
     authorization: str | None = Header(default=None, alias="Authorization"),
 ) -> TestConnectionResponse:
-    _require_authentication(authorization)
+    user = _require_authentication(authorization)
+    AuthorizationService.verify_data_source_access(data_source_id, user.id)
     return data_source_service.test_connection(data_source_id, payload)
 
+
+@router.post("/{data_source_id}/upload", response_model=DataSourceResponse)
+def upload_data_source_file(
+    data_source_id: str,
+    file: UploadFile = File(...),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> DataSourceResponse:
+    user = _require_authentication(authorization)
+    AuthorizationService.verify_data_source_access(data_source_id, user.id)
+    data_source = data_source_service.upload_file(data_source_id, file)
+    return DataSourceResponse(
+        id=data_source.id or "",
+        project_id=data_source.project_id,
+        name=data_source.name,
+        type=data_source.type,
+        connection_details=data_source.connection_details,
+        status=data_source.status,
+        created_at=data_source.created_at,
+        updated_at=data_source.updated_at,
+    )

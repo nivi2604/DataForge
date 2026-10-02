@@ -10,16 +10,6 @@ from app.models.user import User
 from app.models.workspace import Workspace
 
 
-@pytest.fixture(autouse=True)
-def clear_repositories() -> None:
-    with SessionLocal() as session:
-        session.query(Project).delete()
-        session.query(Workspace).delete()
-        session.query(Organization).delete()
-        session.query(User).delete()
-        session.commit()
-
-
 @pytest.fixture()
 def client() -> TestClient:
     return TestClient(app)

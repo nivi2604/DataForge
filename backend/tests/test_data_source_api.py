@@ -16,17 +16,6 @@ from app.models.user import User
 from app.models.workspace import Workspace
 
 
-@pytest.fixture(autouse=True)
-def clear_repositories() -> None:
-    with SessionLocal() as session:
-        session.query(DataSource).delete()
-        session.query(Project).delete()
-        session.query(Workspace).delete()
-        session.query(Organization).delete()
-        session.query(User).delete()
-        session.commit()
-
-
 @pytest.fixture()
 def client() -> TestClient:
     return TestClient(app)
@@ -49,15 +38,22 @@ def _auth_headers(client: TestClient) -> dict[str, str]:
 
 
 def _seed_project() -> str:
+    from app.models.organization import Organization
+    from app.models.user import User
     with SessionLocal() as session:
-        workspace = Workspace(id="workspace-data", name="Workspace Data")
+        user = session.query(User).filter_by(email="datasource@example.com").first()
+        if not user:
+            # If user not created yet, just use a dummy or create it
+            pass
+        org = Organization(id="org-data", name="Org Data", owner_id=user.id if user else "dummy")
+        session.add(org)
+        session.commit()
+        workspace = Workspace(id="workspace-data", organization_id="org-data", name="Workspace Data")
         session.add(workspace)
         session.commit()
-        session.refresh(workspace)
         project = Project(id="project-data", workspace_id=workspace.id, name="Project Data", description="Seed project", status="active")
         session.add(project)
         session.commit()
-        session.refresh(project)
         return project.id
 
 

@@ -1,0 +1,142 @@
+
+
+
+
+.dq-layout {
+  display: flex;
+  gap: 24px;
+  flex: 1;
+  min-height: 500px;
+  align-items: flex-start;
+}
+
+.dq-list-pane {
+  flex: 1;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+
+
+
+
+
+
+
+/* Detail Pane */
+.dq-detail-pane {
+  width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.dq-score-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 32px 24px;
+  text-align: center;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+
+.dq-score-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 16px 0;
+}
+
+.dq-score-value {
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 16px;
+}
+
+.dq-score-value.excellent { color: #10b981; }
+.dq-score-value.warning { color: #f59e0b; }
+.dq-score-value.poor { color: #ef4444; }
+
+
+.dq-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.dq-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 16px 0;
+}
+
+.dq-check-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+.dq-check-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.dq-check-label {
+  font-size: 14px;
+  color: #475569;
+  font-weight: 500;
+}
+
+.dq-check-value {
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dq-check-value.pass { color: #059669; }
+.dq-check-value.fail { color: #dc2626; }
+.dq-check-value.neutral { color: #334155; }
+
+.dq-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.dq-meta-item {
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.dq-meta-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.dq-meta-value {
+  font-size: 13px;
+  color: #0f172a;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+

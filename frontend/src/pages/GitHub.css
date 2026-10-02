@@ -1,0 +1,227 @@
+
+
+
+
+/* Flow Diagram */
+.gh-flow-diagram {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 32px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  overflow-x: hidden;
+}
+
+.gh-flow-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  max-width: 100px;
+  height: 50px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #334155;
+  text-align: center;
+  padding: 4px;
+}
+
+.gh-flow-box.gh {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.gh-flow-box.final {
+  background: #ecfdf5;
+  border-color: #10b981;
+  color: #047857;
+  font-weight: 700;
+}
+
+.gh-flow-arrow {
+  color: #94a3b8;
+  font-size: 16px;
+  margin: 0 8px;
+  flex-shrink: 0;
+}
+
+.gh-layout {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.gh-sidebar {
+  flex: 0 0 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.gh-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+
+
+.gh-conn-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gh-conn-item {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #f8fafc;
+}
+
+.gh-conn-item:hover {
+  border-color: #cbd5e1;
+}
+
+.gh-conn-item.selected {
+  background: #eff6ff;
+  border-color: #3b82f6;
+}
+
+.gh-conn-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.gh-repo-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.gh-status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #059669;
+}
+
+.gh-status-indicator::before {
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+.gh-btn-remove {
+  color: #ef4444;
+  background: none;
+  border: none;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 12px;
+  text-align: left;
+}
+.gh-btn-remove:hover { text-decoration: underline; }
+
+
+
+/* PR List */
+.gh-pr-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.gh-pr-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gh-pr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.gh-pr-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gh-pr-meta {
+  font-size: 13px;
+  color: #64748b;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.gh-branch-badge {
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 12px;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.gh-pr-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* Validations Table */
+
+.gh-commit-hash {
+  font-family: monospace;
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+

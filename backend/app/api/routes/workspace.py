@@ -3,15 +3,17 @@ from fastapi import APIRouter, Header, Response, status
 from app.api.routes.auth import auth_service
 from app.core.security import get_current_user
 from app.models.workspace import Workspace
+from app.models.user import User
 from app.schemas.workspace import WorkspaceCreate, WorkspaceResponse, WorkspaceUpdate
 from app.services.workspace_service import WorkspaceService
+from app.services.authorization_service import AuthorizationService
 
 router = APIRouter(prefix="/workspaces", tags=["workspaces"])
 workspace_service = WorkspaceService()
 
 
-def _require_authentication(authorization: str | None) -> None:
-    get_current_user(authorization, auth_service.user_repository)
+def _require_authentication(authorization: str | None) -> User:
+    return get_current_user(authorization, auth_service.user_repository)
 
 
 @router.get("", response_model=list[WorkspaceResponse])
@@ -19,8 +21,11 @@ def list_workspaces(
     organization_id: str | None = None,
     authorization: str | None = Header(default=None, alias="Authorization"),
 ) -> list[WorkspaceResponse]:
-    _require_authentication(authorization)
+    user = _require_authentication(authorization)
+    if organization_id:
+        AuthorizationService.verify_organization_access(organization_id, user.id)
     workspaces = workspace_service.list_workspaces(organization_id=organization_id)
+    workspaces = AuthorizationService.filter_workspaces(workspaces, user.id)
     return [
         WorkspaceResponse(
             id=workspace.id or "",
@@ -38,7 +43,8 @@ def get_workspace(
     workspace_id: str,
     authorization: str | None = Header(default=None, alias="Authorization"),
 ) -> WorkspaceResponse:
-    _require_authentication(authorization)
+    user = _require_authentication(authorization)
+    AuthorizationService.verify_workspace_access(workspace_id, user.id)
     workspace = workspace_service.get_workspace(workspace_id)
     return WorkspaceResponse(
         id=workspace.id or "",
@@ -54,7 +60,9 @@ def create_workspace(
     payload: WorkspaceCreate,
     authorization: str | None = Header(default=None, alias="Authorization"),
 ) -> WorkspaceResponse:
-    _require_authentication(authorization)
+    user = _require_authentication(authorization)
+    if payload.organization_id:
+        AuthorizationService.verify_organization_access(payload.organization_id, user.id)
     workspace = workspace_service.create_workspace(payload)
     return WorkspaceResponse(
         id=workspace.id or "",
@@ -71,7 +79,10 @@ def update_workspace(
     payload: WorkspaceUpdate,
     authorization: str | None = Header(default=None, alias="Authorization"),
 ) -> WorkspaceResponse:
-    _require_authentication(authorization)
+    user = _require_authentication(authorization)
+    AuthorizationService.verify_workspace_access(workspace_id, user.id)
+    if payload.organization_id:
+        AuthorizationService.verify_organization_access(payload.organization_id, user.id)
     workspace = workspace_service.update_workspace(workspace_id, payload)
     return WorkspaceResponse(
         id=workspace.id or "",
@@ -87,6 +98,7 @@ def delete_workspace(
     workspace_id: str,
     authorization: str | None = Header(default=None, alias="Authorization"),
 ) -> Response:
-    _require_authentication(authorization)
+    user = _require_authentication(authorization)
+    AuthorizationService.verify_workspace_access(workspace_id, user.id)
     workspace_service.delete_workspace(workspace_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

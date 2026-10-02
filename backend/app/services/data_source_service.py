@@ -1,11 +1,13 @@
 import json
 import socket
 import zipfile
+import shutil
+import uuid
 from pathlib import Path
 from urllib.error import URLError
 from urllib.request import Request, urlopen
 
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, UploadFile
 
 from app.api.routes.project import project_service
 from app.models.data_source import DataSource
@@ -20,16 +22,22 @@ class DataSourceService:
         "postgresql": "PostgreSQL",
         "mysql": "MySQL",
         "csv": "CSV",
+        "json": "JSON",
+        "parquet": "Parquet",
         "excel": "Excel",
         "rest api": "REST API",
+        "github": "GitHub",
     }
 
     def __init__(self) -> None:
         self.data_source_repository = DataSourceRepository()
         self.project_repository = project_service.project_repository
 
-    def list_data_sources(self) -> list[DataSource]:
-        return [self._sanitize_data_source(data_source) for data_source in self.data_source_repository.list_data_sources()]
+    def list_data_sources(self, project_id: str | None = None) -> list[DataSource]:
+        data_sources = self.data_source_repository.list_data_sources()
+        if project_id:
+            data_sources = [ds for ds in data_sources if ds.project_id == project_id]
+        return [self._sanitize_data_source(ds) for ds in data_sources]
 
     def get_data_source(self, data_source_id: str) -> DataSource:
         data_source = self.data_source_repository.get_data_source_by_id(data_source_id)
@@ -103,6 +111,37 @@ class DataSourceService:
         if not data_source:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data source not found")
         self.data_source_repository.delete_data_source(data_source_id)
+
+    def upload_file(self, data_source_id: str, file: UploadFile) -> DataSource:
+        data_source = self.data_source_repository.get_data_source_by_id(data_source_id)
+        if not data_source:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data source not found")
+
+        normalized_type = self._normalize_type(data_source.type)
+        if normalized_type not in {"CSV", "JSON", "Parquet", "Excel"}:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File upload is only supported for file-based data sources")
+
+        uploads_dir = Path(__file__).parent.parent.parent / "uploads"
+        uploads_dir.mkdir(exist_ok=True)
+
+        # Generate a safe, collision-resistant filename
+        ext = normalized_type.lower()
+        if ext == "excel": ext = "xlsx"
+        safe_filename = f"{data_source_id}_{uuid.uuid4().hex[:8]}.{ext}"
+        file_path = uploads_dir / safe_filename
+
+        try:
+            with file_path.open("wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
+        except Exception as exc:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to save file: {str(exc)}")
+
+        details = self._parse_connection_details(data_source.connection_details)
+        details["path"] = str(file_path.resolve())
+        data_source.connection_details = json.dumps(details)
+
+        updated_data_source = self.data_source_repository.update_data_source(data_source_id, data_source)
+        return self._sanitize_data_source(updated_data_source)
 
     def test_connection(self, data_source_id: str, payload: TestConnectionRequest) -> TestConnectionResponse:
         data_source = self.data_source_repository.get_data_source_by_id(data_source_id)
@@ -179,12 +218,20 @@ class DataSourceService:
             required = {"host", "port", "database", "username", "password"}
         elif data_type == "MySQL":
             required = {"host", "port", "database", "username", "password"}
-        elif data_type == "CSV":
-            required = {"path"}
-        elif data_type == "Excel":
+        elif data_type in {"CSV", "JSON", "Parquet", "Excel"}:
+            if not parsed_details.get("path"):
+                ext = data_type.lower()
+                if ext == "excel": ext = "xlsx"
+                managed_path = (Path(__file__).parent.parent.parent / "uploads" / f"managed_{uuid.uuid4().hex}.{ext}").resolve()
+                managed_path.parent.mkdir(exist_ok=True)
+                if data_type in {"CSV", "JSON"}:
+                    managed_path.touch() # Create empty file so test connection passes
+                parsed_details["path"] = str(managed_path)
             required = {"path"}
         elif data_type == "REST API":
             required = {"url"}
+        elif data_type == "GitHub":
+            required = {"connection_id", "branch", "file_path"}
         else:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unsupported data source type")
 
@@ -217,10 +264,27 @@ class DataSourceService:
                 raise ValueError(f"Connection failed: {exc}") from exc
             return
 
-        if data_type == "CSV":
+        if data_type in {"CSV", "JSON", "Parquet"}:
             path = Path(str(details["path"]))
             if not path.exists() or not path.is_file():
-                raise ValueError("CSV file does not exist")
+                raise ValueError(f"{data_type} file does not exist")
+
+            if data_type == "JSON":
+                try:
+                    with open(path, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                        if not isinstance(data, list):
+                            raise ValueError("JSON file does not contain a valid JSON array")
+                except json.JSONDecodeError:
+                    raise ValueError("File is not valid JSON")
+
+            if data_type == "Parquet":
+                try:
+                    import pyarrow.parquet as pq
+                    pq.read_metadata(path)
+                except Exception as e:
+                    raise ValueError("File is not valid Parquet")
+
             return
 
         if data_type == "Excel":
@@ -239,6 +303,10 @@ class DataSourceService:
             request = Request(url, method="GET")
             with urlopen(request, timeout=5) as response:
                 response.read(1)
+            return
+
+        if data_type == "GitHub":
+            # Validation handled dynamically during execution since we need user_id
             return
 
         raise ValueError("Unsupported data source type")

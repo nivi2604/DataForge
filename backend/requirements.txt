@@ -14,3 +14,9 @@ redis
 celery
 minio
 pytest
+
+croniter
+pandas
+pyarrow
+cryptography
+httpx

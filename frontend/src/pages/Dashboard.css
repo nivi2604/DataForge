@@ -1,0 +1,343 @@
+/* ─── Dashboard page ────────────────────────────────────────────────────────── */
+.dashboard-container {
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-sizing: border-box;
+  animation: df-fadeIn 0.35s ease-out;
+}
+
+@keyframes df-fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Header ─────────────────────────────────────────────────────────────────── */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.dashboard-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.3px;
+  margin: 0 0 2px 0;
+}
+
+.dashboard-subtitle {
+  color: #64748b;
+  font-size: 13px;
+  margin: 0;
+}
+
+/* ─── Metrics grid ───────────────────────────────────────────────────────────── */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 1100px) {
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.metric-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px 18px 16px 21px;   /* extra left for the accent stripe */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: #e2e8f0;
+  border-radius: 10px 0 0 10px;
+}
+
+.metric-card.good::before  { background: #10b981; }
+.metric-card.bad::before   { background: #ef4444; }
+.metric-card.info::before  { background: #3b82f6; }
+
+.metric-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+}
+
+.metric-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+
+.metric-value {
+  font-size: 30px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+
+.metric-trend {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.metric-trend.good { color: #10b981; }
+.metric-trend.bad  { color: #ef4444; }
+
+/* ─── Two-column layout ──────────────────────────────────────────────────────── */
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 1200px) {
+  .dashboard-layout { grid-template-columns: 1fr 280px; }
+}
+
+@media (max-width: 1024px) {
+  .dashboard-layout { grid-template-columns: 1fr; }
+}
+
+/* ─── Cards ──────────────────────────────────────────────────────────────────── */
+.card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #fafafa;
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+  letter-spacing: -0.1px;
+}
+
+.card-body {
+  padding: 0;
+}
+
+.card-body.padded {
+  padding: 16px;
+}
+
+/* ─── Data table ──────────────────────────────────────────────────────────────── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  /* Fixed layout so the Pipeline column doesn't steal all space */
+  table-layout: fixed;
+}
+
+.data-table th {
+  padding: 8px 12px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.data-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  vertical-align: middle;
+  /* Prevent any cell from causing row overflow */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tbody tr:hover td {
+  background: #f8fafc;
+}
+
+/* ─── Explicit column widths for the executions table ─────────────────────────
+   Columns: Pipeline | Status | Rows | Duration | Timestamp
+   Pipeline gets the most space; the rest are compact. */
+.data-table.exec-table col.col-pipeline  { width: auto; }
+.data-table.exec-table col.col-status    { width: 96px; }
+.data-table.exec-table col.col-rows      { width: 56px; }
+.data-table.exec-table col.col-duration  { width: 72px; }
+.data-table.exec-table col.col-timestamp { width: 110px; }
+
+/* ─── Explicit column widths for the pipelines overview table ─────────────────
+   Columns: Name | Version | Status | Last Updated */
+.data-table.pipe-table col.col-name    { width: auto; }
+.data-table.pipe-table col.col-version { width: 56px; }
+.data-table.pipe-table col.col-status  { width: 80px; }
+.data-table.pipe-table col.col-date    { width: 100px; }
+
+/* ─── Badges ──────────────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+.badge.completed { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+.badge.running   { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+.badge.failed    { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+.badge.active    { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+.badge.inactive  { background: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; }
+.badge.pending   { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+
+/* ─── Data Quality summary card ───────────────────────────────────────────────── */
+.dq-score-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0 14px;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 4px;
+}
+
+.dq-score-number {
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -1px;
+  flex-shrink: 0;
+}
+
+.dq-score-number.excellent { color: #10b981; }
+.dq-score-number.good      { color: #f59e0b; }
+.dq-score-number.warning   { color: #f59e0b; }
+.dq-score-number.critical  { color: #ef4444; }
+
+.dq-score-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.dq-score-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.dq-score-badge {
+  display: inline-flex;
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.dq-score-badge.excellent { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+.dq-score-badge.good,
+.dq-score-badge.warning   { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+.dq-score-badge.critical  { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+/* ─── Quality metric rows (shared by DQ card and GitHub card) ────────────────── */
+.quality-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.quality-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.quality-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.quality-label {
+  color: #64748b;
+  font-size: 12.5px;
+}
+
+.quality-value {
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 12.5px;
+}
+
+.dq-footnote {
+  margin-top: 12px;
+  font-size: 11px;
+  color: #94a3b8;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ─── Empty & loading states ──────────────────────────────────────────────────── */
+.empty-state {
+  padding: 32px 16px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e2e8f0;
+  border-radius: 50%;
+  border-top-color: #3b82f6;
+  animation: df-spin 0.8s linear infinite;
+  margin: 60px auto;
+}
+
+@keyframes df-spin {
+  to { transform: rotate(360deg); }
+}

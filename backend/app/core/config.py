@@ -18,6 +18,8 @@ class Settings:
     secret_key: str = os.getenv("SECRET_KEY", "change-me-in-production")
     algorithm: str = os.getenv("ALGORITHM", "HS256")
     access_token_expire_minutes: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+    scheduler_polling_interval: int = int(os.getenv("SCHEDULER_POLLING_INTERVAL", "60"))
+    github_webhook_secret: str = os.getenv("GITHUB_WEBHOOK_SECRET", "")
 
 
 settings = Settings()

@@ -3,14 +3,16 @@ from fastapi import APIRouter, Header, Response, status
 from app.api.routes.auth import auth_service
 from app.core.security import get_current_user
 from app.models.organization import Organization
+from app.models.user import User
 from app.schemas.organization import OrganizationCreate, OrganizationResponse, OrganizationUpdate
 from app.services.organization_service import OrganizationService
+from app.services.authorization_service import AuthorizationService
 
 router = APIRouter(prefix="/organizations", tags=["organizations"])
 organization_service = OrganizationService()
 
 
-def _require_authentication(authorization: str | None) -> None:
+def _require_authentication(authorization: str | None) -> User:
     return get_current_user(authorization, auth_service.user_repository)
 
 
@@ -18,8 +20,9 @@ def _require_authentication(authorization: str | None) -> None:
 def list_organizations(
     authorization: str | None = Header(default=None, alias="Authorization"),
 ) -> list[OrganizationResponse]:
-    _require_authentication(authorization)
+    user = _require_authentication(authorization)
     organizations = organization_service.list_organizations()
+    organizations = AuthorizationService.filter_organizations(organizations, user.id)
     return [
         OrganizationResponse(
             id=organization.id or "",
@@ -37,7 +40,8 @@ def get_organization(
     organization_id: str,
     authorization: str | None = Header(default=None, alias="Authorization"),
 ) -> OrganizationResponse:
-    _require_authentication(authorization)
+    user = _require_authentication(authorization)
+    AuthorizationService.verify_organization_access(organization_id, user.id)
     organization = organization_service.get_organization(organization_id)
     return OrganizationResponse(
         id=organization.id or "",

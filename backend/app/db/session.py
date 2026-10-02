@@ -6,8 +6,18 @@ from sqlalchemy.orm import Session, sessionmaker
 from app.core.config import settings
 from app.db.base import Base
 
-engine = create_engine(settings.database_url, pool_pre_ping=True, echo=settings.database_echo)
-SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False)
+engine = create_engine(
+    settings.database_url,
+    pool_pre_ping=True,
+    echo=settings.database_echo,
+)
+
+SessionLocal = sessionmaker(
+    bind=engine,
+    autoflush=False,
+    autocommit=False,
+    expire_on_commit=False,
+)
 
 
 class DatabaseSessionManager:
@@ -34,9 +44,17 @@ def get_db_session() -> Generator[Session, None, None]:
 
 def init_db() -> None:
     from app.models.data_source import DataSource
+    from app.models.execution_log import ExecutionLog
     from app.models.organization import Organization
+    from app.models.pipeline import Pipeline
+    from app.models.pipeline_execution import PipelineExecution
+    from app.models.pipeline_node import PipelineNode
+    from app.models.pipeline_schedule import PipelineSchedule
     from app.models.project import Project
     from app.models.user import User
     from app.models.workspace import Workspace
+    from app.models.pipeline_version import PipelineVersion
+    from app.models.github_connection import GithubConnection
+    from app.models.github_pr_validation import GithubPRValidation
 
     Base.metadata.create_all(bind=engine)

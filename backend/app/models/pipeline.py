@@ -1,13 +1,40 @@
-from dataclasses import dataclass
+from sqlalchemy import ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.db.base import Base
 
 
-@dataclass
-class Pipeline:
-    id: str | None = None
-    project_id: str | None = None
-    name: str | None = None
-    description: str | None = None
-    version: str | None = None
-    status: str | None = None
-    created_at: str | None = None
-    updated_at: str | None = None
+class Pipeline(Base):
+    __tablename__ = "pipelines"
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    project_id: Mapped[str | None] = mapped_column(
+        String(64),
+        ForeignKey("projects.id", ondelete="RESTRICT"),
+        nullable=True,
+        index=True,
+    )
+    name: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+    )
+    description: Mapped[str | None] = mapped_column(
+        String(1000),
+        nullable=True,
+    )
+    version: Mapped[str | None] = mapped_column(
+        String(50),
+        nullable=True,
+    )
+    status: Mapped[str | None] = mapped_column(
+        String(50),
+        nullable=True,
+    )
+    created_at: Mapped[str | None] = mapped_column(
+        String(100),
+        nullable=True,
+    )
+    updated_at: Mapped[str | None] = mapped_column(
+        String(100),
+        nullable=True,
+    )

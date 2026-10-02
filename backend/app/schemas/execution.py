@@ -15,6 +15,7 @@ class ExecutionResponse:
     completed_at: str | None = None
     duration: int | None = None
     triggered_by: str | None = None
+    error_message: str | None = None
     created_at: str | None = None
 
 

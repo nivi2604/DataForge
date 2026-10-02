@@ -20,6 +20,12 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+*.pyc
+*.log
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
 
 # Virtual environments
 .venv/
@@ -42,6 +48,7 @@ docker-compose.override.yml
 
 # VS Code
 .vscode/
+.vscode/settings.json
 
 # macOS
 .DS_Store
@@ -53,3 +60,79 @@ Desktop.ini
 # Linux
 *.swp
 *~
+*.db
+
+# DataForge local development artifacts
+backend/backup.json
+backend/*.sql
+backend/pytest_output.txt
+backend/error.png
+backend/e2e_results.json
+backend/e2e_data.csv
+backend/test_data.csv
+backend/test_out.csv
+backend/test_input.csv
+backend/uploads/
+test_input.csv
+test_output.csv
+backend/repair_*.py
+backend/diagnose_*.py
+backend/query_*.py
+backend/check_*.py
+backend/dump_*.py
+backend/fix_*.py
+backend/verify_*.py
+backend/update_*.py
+backend/list_tables.py
+backend/search_id.py
+backend/investigate_db.py
+backend/get_project_id.py
+backend/remove_fixtures.py
+backend/complete_pipeline.py
+backend/run_pipeline.py
+backend/add_fks.py
+backend/add_nodes.py
+backend/test_jwt.py
+backend/test_script.py
+backend/test_pipeline_load.py
+
+
+# Frontend dependencies and build output
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Local environment files
+.env.*
+!.env.example
+frontend/.env*
+!frontend/.env.example
+backend/.env*
+
+# Local logs and debugging artifacts
+frontend/*.log
+frontend/network_log.txt
+frontend/debug_*.py
+frontend/check_*.py
+frontend/refactor_*.py
+frontend/rewrite_*.py
+frontend/update_*.py
+
+# Local scratch and test utilities
+backend/scratch_*.py
+backend/test_*.py
+backend/reset_pwd.py
+backend/cleanup_db.py
+backend/setup_demo_scenarios.py
+backend/trigger_pipeline.py
+backend/acceptance_results.json
+acceptance_results.json
+backend/e2e_*.py
+backend/acceptance_test.py
+backend/venv.cfg
+
+# Local demo datasets (review separately before publishing)
+backend/tips_clean.csv
+backend/tips_duplicates.csv
+backend/tips_invalid.csv
+backend/titanic_missing.csv
